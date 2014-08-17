@@ -1,0 +1,299 @@
+
+--  ------ author Bender, Blocherer, Rossmehl and Rotter
+--
+--         This file is part of Open Decision Maker.
+-- 
+--         Open Decision Maker is free software: you can redistribute it and/or
+--         modify it under the terms of the GNU General Public License as
+--         published by the Free Software Foundation, either version 3 of the
+--         License, or (at your option) any later version.
+-- 
+--         Open Decision Maker is distributed in the hope that it will be
+--         useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+--         of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+--         General Public License for more details.
+-- 
+--         You should have received a copy of the GNU General Public License
+--         along with Open Decision Maker. If not, see
+--         <http://www.gnu.org/licenses/>.
+-- ------
+
+
+
+-- -----------------------------------------------------
+
+-- Table `Goals`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `Goals` (
+
+  `idGoals` INT NOT NULL AUTO_INCREMENT ,
+
+  `Name` VARCHAR(45) NOT NULL ,
+
+  `Description` LONGTEXT NULL ,
+
+  PRIMARY KEY (`idGoals`) )
+
+ENGINE = InnoDB;
+
+
+
+
+
+-- -----------------------------------------------------
+
+-- Table `Alternatives`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `Alternatives` (
+
+  `idAlternatives` INT NOT NULL AUTO_INCREMENT ,
+
+  `Name` VARCHAR(45) NOT NULL ,
+
+  `Description` LONGTEXT NULL ,
+
+  `Goals_idGoals` INT NOT NULL ,
+
+  PRIMARY KEY (`idAlternatives`, `Goals_idGoals`) ,
+
+  INDEX `fk_Alternatives_Goals1` (`Goals_idGoals` ASC) ,
+
+  CONSTRAINT `fk_Alternatives_Goals1`
+
+    FOREIGN KEY (`Goals_idGoals` )
+
+    REFERENCES `Goals` (`idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION)
+
+ENGINE = InnoDB;
+
+
+
+
+
+-- -----------------------------------------------------
+
+-- Table `Criteria`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `Criteria` (
+
+  `idCriteria` INT NOT NULL AUTO_INCREMENT ,
+
+  `Name` VARCHAR(45) NOT NULL COMMENT '		' ,
+
+  `Description` LONGTEXT NULL ,
+
+  `Goals_idGoals` INT NOT NULL ,
+
+  PRIMARY KEY (`idCriteria`, `Goals_idGoals`) ,
+
+  INDEX `fk_Criteria_Goals1` (`Goals_idGoals` ASC) ,
+
+  CONSTRAINT `fk_Criteria_Goals1`
+
+    FOREIGN KEY (`Goals_idGoals` )
+
+    REFERENCES `Goals` (`idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION)
+
+ENGINE = InnoDB;
+
+
+
+
+
+-- -----------------------------------------------------
+
+-- Table `WeightingsCriteria`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `WeightingsCriteria` (
+
+  `Value` DOUBLE NOT NULL DEFAULT 1 ,
+
+  `Criteria_idCriteria` INT NOT NULL ,
+
+  `Goals_idGoals` INT NOT NULL ,
+
+  `Criteria_idCriteria2` INT NOT NULL ,
+
+  PRIMARY KEY (`Criteria_idCriteria`, `Goals_idGoals`, `Criteria_idCriteria2`) ,
+
+  INDEX `fk_WeightingsCrtieria_Criteria2` (`Criteria_idCriteria2` ASC, `Goals_idGoals` ASC) ,
+
+  CONSTRAINT `fk_WeightingsCrtieria_Criteria1`
+
+    FOREIGN KEY (`Criteria_idCriteria` , `Goals_idGoals` )
+
+    REFERENCES `Criteria` (`idCriteria` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT `fk_WeightingsCrtieria_Criteria2`
+
+    FOREIGN KEY (`Criteria_idCriteria2` , `Goals_idGoals` )
+
+    REFERENCES `Criteria` (`idCriteria` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION)
+
+ENGINE = InnoDB;
+
+
+
+
+
+-- -----------------------------------------------------
+
+-- Table `Subcriteria`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `Subcriteria` (
+
+  `Criteria_idCriteriaParent` INT NOT NULL ,
+
+  `Goals_idGoals` INT NOT NULL ,
+
+  `Criteria_idCriteriaChild` INT NOT NULL ,
+
+  PRIMARY KEY (`Criteria_idCriteriaParent`, `Goals_idGoals`, `Criteria_idCriteriaChild`) ,
+
+  INDEX `fk_Subcriteria_Criteria2` (`Criteria_idCriteriaChild` ASC, `Goals_idGoals` ASC) ,
+
+  CONSTRAINT `fk_Subcriteria_Criteria1`
+
+    FOREIGN KEY (`Criteria_idCriteriaParent` , `Goals_idGoals` )
+
+    REFERENCES `Criteria` (`idCriteria` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT `fk_Subcriteria_Criteria2`
+
+    FOREIGN KEY (`Criteria_idCriteriaChild` , `Goals_idGoals` )
+
+    REFERENCES `Criteria` (`idCriteria` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION)
+
+ENGINE = InnoDB;
+
+
+
+
+
+-- -----------------------------------------------------
+
+-- Table `WeightingsAlternatives`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `WeightingsAlternatives` (
+
+  `Alternatives_idAlternatives` INT NOT NULL ,
+
+  `Alternatives_idAlternatives2` INT NOT NULL ,
+
+  `Criteria_idCriteria` INT NOT NULL ,
+
+  `Goals_idGoals` INT NOT NULL ,
+
+  `Value` DOUBLE NOT NULL DEFAULT 1 ,
+
+  PRIMARY KEY (`Alternatives_idAlternatives`, `Alternatives_idAlternatives2`, `Criteria_idCriteria`, `Goals_idGoals`) ,
+
+  INDEX `fk_WeightingsAlternatives_Alternatives1` (`Alternatives_idAlternatives` ASC, `Goals_idGoals` ASC) ,
+
+  INDEX `fk_WeightingsAlternatives_Alternatives2` (`Alternatives_idAlternatives2` ASC, `Goals_idGoals` ASC) ,
+
+  INDEX `fk_WeightingsAlternatives_Criteria1` (`Criteria_idCriteria` ASC, `Goals_idGoals` ASC) ,
+
+  CONSTRAINT `fk_WeightingsAlternatives_Alternatives1`
+
+    FOREIGN KEY (`Alternatives_idAlternatives` , `Goals_idGoals` )
+
+    REFERENCES `Alternatives` (`idAlternatives` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT `fk_WeightingsAlternatives_Alternatives2`
+
+    FOREIGN KEY (`Alternatives_idAlternatives2` , `Goals_idGoals` )
+
+    REFERENCES `Alternatives` (`idAlternatives` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT `fk_WeightingsAlternatives_Criteria1`
+
+    FOREIGN KEY (`Criteria_idCriteria` , `Goals_idGoals` )
+
+    REFERENCES `Criteria` (`idCriteria` , `Goals_idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION)
+
+ENGINE = InnoDB;
+
+
+
+
+
+-- -----------------------------------------------------
+
+-- Table `TabDescriptions`
+
+-- -----------------------------------------------------
+
+CREATE  TABLE IF NOT EXISTS `TabDescriptions` (
+
+  `Goals_idGoals` INT NOT NULL ,
+
+  `CriteriaDesc` LONGTEXT NULL ,
+
+  `AlternativesDesc` LONGTEXT NULL COMMENT '				' ,
+
+  `WeightingsCriteriaDesc` LONGTEXT NULL ,
+
+  `WeightingsAlternativesDesc` LONGTEXT NULL ,
+
+  PRIMARY KEY (`Goals_idGoals`) ,
+
+  CONSTRAINT `fk_TabDescriptions_Goals1`
+
+    FOREIGN KEY (`Goals_idGoals` )
+
+    REFERENCES `Goals` (`idGoals` )
+
+    ON DELETE NO ACTION
+
+    ON UPDATE NO ACTION)
+
+ENGINE = InnoDB;
